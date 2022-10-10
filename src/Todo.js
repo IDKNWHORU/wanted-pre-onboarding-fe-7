@@ -57,6 +57,24 @@ export const Todo = () => {
       .catch(console.error);
   };
 
+  const deleteTD = (id) => {
+    fetch(`http://localhost:8000/todos/${id}`, {
+      method: "delete",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("at")).access_token
+        }`,
+      },
+    }).then((res) => {
+      if (res.status === 204) {
+        load(tds.filter((td) => td.id !== id));
+      } else {
+        throw new Error(res.statusText);
+      }
+    });
+  };
+
   return (
     <>
       <h1>Todo</h1>
@@ -71,9 +89,11 @@ export const Todo = () => {
       </form>
       <ul>
         {tds.map((td) => (
-          <li>
+          <li key={td.id}>
             <p>
               {td.todo}, {td.isCompleted === true ? "완료" : "미완료"}
+              <button>edit</button>
+              <button onClick={(_) => deleteTD(td.id)}>delete</button>
             </p>
           </li>
         ))}
