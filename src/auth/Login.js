@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
   const [validInfo, setValid] = useState({ email: false, password: false });
+  const nv = useNavigate();
 
-  const validation = (form) => {
+  const auth = (form) => {
     const { email, password } = form;
     const rb = { email: email.value, password: password.value };
 
@@ -11,7 +13,19 @@ export const Login = () => {
       method: "POST",
       body: JSON.stringify({ ...rb }),
       headers: { "Content-Type": "application/json" },
-    });
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          return res.json();
+        } else {
+          throw new Error(res.statusText);
+        }
+      })
+      .then((at) => {
+        localStorage.setItem("at", JSON.stringify(at));
+        nv("todo");
+      })
+      .catch(console.error);
   };
 
   const validEmail = (email) => {
@@ -28,6 +42,12 @@ export const Login = () => {
     });
   };
 
+  useEffect(() => {
+    if (localStorage.length === 1) {
+      nv("/todo");
+    }
+  }, []);
+
   return (
     <article>
       <h1>Login</h1>
@@ -35,7 +55,7 @@ export const Login = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            validation(e.target);
+            auth(e.target);
           }}
         >
           <label htmlFor="email">Email</label>
