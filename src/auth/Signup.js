@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Signup = () => {
+  const nv = useNavigate();
   const [validInfo, setValid] = useState({ email: false, password: false });
 
-  const validation = (form) => {
+  const createUser = (form) => {
     const { email, password } = form;
     const rb = { email: email.value, password: password.value };
 
@@ -11,7 +13,7 @@ export const Signup = () => {
       method: "POST",
       body: JSON.stringify({ ...rb }),
       headers: { "Content-Type": "application/json" },
-    });
+    }).then(nv("/"));
   };
 
   const validEmail = (email) => {
@@ -35,7 +37,7 @@ export const Signup = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            validation(e.target);
+            createUser(e.target);
           }}
         >
           <label htmlFor="email">Email</label>
